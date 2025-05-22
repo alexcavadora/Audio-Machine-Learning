@@ -1,0 +1,171 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+
+% Información de la portada
+\newcommand{\institucion}{UNIVERSIDAD DE GUANAJUATO}
+\newcommand{\materia}{Analisis de Datos}
+\newcommand{\profesor}{Carlos A. Carballo Monsivais}
+%\newcommand{\numeroTarea}{Número de Tarea: 01}
+\newcommand{\nombreTarea}{CRISP-DM. Clasificación de Géneros Musicales y Análisis de Similitud. Capitulo 1. Comprensión del Negocio y los Datos}
+\newcommand{\estudiante}{Alejandro Alonso Sanchez, Piotr Enriquevitch Lopez Chernyshov, Victor Angel Lopez Romero}
+\newcommand{\fechaEntrega}{Fecha de Entrega: 04/06/2025}
+\newcommand{\nua}{NUA: 148494}
+% Título del documento
+\title{Reporte de Tareas Prácticas}
+\begin{document}
+\begin{titlepage}
+    \centering
+    \includegraphics[width=0.3\textwidth]{logoUG.png}\par\vspace{1cm}
+    {\scshape\LARGE \institucion \par}
+    \vspace{1cm}
+    {\scshape\Large \materia \par}
+    \vspace{1.5cm}
+    {\scshape\bfseries \numeroTarea \par}
+    \vspace{1.5cm}
+    {\huge\bfseries \nombreTarea \par}
+    \vspace{2cm}
+    Alumnos: \par
+    {\Large\itshape \estudiante \par}
+    \vfill
+    Profesor:\par
+    \textsc{\profesor}
+    \vfill
+    {\large \fechaEntrega\par}
+\end{titlepage}
+
+\section*{Contexto y Objetivo}
+Este trabajo aborda el desarrollo de un modelo capaz de clasificar canciones en géneros musicales a partir de características de audio extraídas del conjunto de datos FMA-medium. Además, se busca identificar qué características son más relevantes para la diferenciación de géneros y sentar las bases para un sistema de recomendación musical. El dataset FMA-medium contiene 25,000 clips de 30 segundos en formato MP3, distribuidos en 16 géneros musicales, con metadatos detallados y características extraídas tanto con librosa como con la API de Spotify.
+
+\section*{1. Comprensión del Negocio}
+
+\section*{1.1 Objetivos de Negocio}
+El proyecto tiene como objetivo primario desarrollar un modelo que pueda clasificar con precisión canciones en sus respectivos géneros basándose en características de audio. Como objetivo secundario, se busca crear un sistema de recomendación que pueda identificar canciones similares basándose en características de audio. Finalmente, el objetivo terciario consiste en obtener información sobre qué características de audio diferencian más fuertemente los géneros musicales.
+
+\section*{1.2 Criterios de Éxito del Negocio}
+Los criterios de éxito establecidos para el proyecto incluyen que el modelo de clasificación de géneros alcance al menos un 75\% de precisión en datos de prueba. Además, el sistema de recomendación debe identificar correctamente canciones de estilo y sensación similar independientemente del género. Por último, el proyecto debe identificar al menos 3 hallazgos clave sobre características de audio que distinguen géneros musicales.
+
+\section*{1.3 Evaluación de la Situación}
+Para llevar a cabo este proyecto se cuenta con recursos disponibles como conjuntos de datos musicales (por ejemplo, Million Song Dataset, datos de la API de Spotify). Las principales suposiciones incluyen que las características de audio pueden ser extraídas y correlacionadas significativamente con etiquetas de género. Entre las restricciones se encuentran los recursos computacionales y posibles limitaciones de derechos de autor en datos musicales. Un riesgo identificado es que la extracción de características de audio podría no capturar todas las características musicales relevantes para la clasificación.
+
+\section*{1.4 Terminología}
+En este proyecto se utilizan diversos términos técnicos. Las Características de Audio son propiedades medibles extraídas de señales de audio. Los MFCC (Coeficientes Cepstrales de Frecuencia Mel) representan el espectro de potencia a corto plazo del sonido, reflejando cómo los humanos perciben el tono. El Centroide Espectral es una medida del "centro de masa" del espectro, indicando el brillo de un sonido. El Ancho de Banda Espectral mide el rango de frecuencias presentes en una señal. Las Características Croma representan el contenido tonal de la música, frecuentemente usado para detectar características armónicas y melódicas.
+
+La Tasa de Cruce por Cero es la tasa a la que una señal cambia de positivo a negativo o viceversa, correlacionándose con la ruidosidad. La Energía RMS representa la sonoridad de una señal de audio. El Tempo es la velocidad o ritmo de una pieza musical medido en beats por minuto (BPM). La Detección de Inicio identifica el comienzo de notas musicales o eventos en una señal de audio. La Agregación de Características es el proceso de combinar características a nivel de marco en representaciones a nivel de canción.
+
+También se utilizan conceptos como la Transformada de Fourier, que convierte señales del dominio del tiempo a representaciones del dominio de frecuencia; la Escala Mel, que es una escala perceptual de tonos juzgados por oyentes para estar a distancias iguales entre sí; el Agrupamiento K-means, un algoritmo de aprendizaje no supervisado que agrupa puntos de datos similares; la Matriz de Confusión, una tabla usada para evaluar el rendimiento del modelo de clasificación; la Puntuación F1, que es la media armónica de precisión y exhaustividad; y t-SNE, una técnica de reducción de dimensionalidad para visualizar datos de alta dimensión.
+
+\section*{1.5 Plan del Proyecto}
+El plan del proyecto incluye un cronograma por definir, recursos necesarios como un entorno Python con bibliotecas para procesamiento de audio y ML, y una evaluación inicial de herramientas y técnicas como Librosa para extracción de características de audio y scikit-learn para modelado de machine learning.
+
+\section*{2. Comprensión de los Datos}
+
+\section*{2.1 Recolección de Datos}
+Como fuentes de datos primarias se utiliza el Free Music Archive (FMA), específicamente el conjunto FMA-medium que contiene 25,000 clips de 30 segundos distribuidos en 16 géneros musicales. Los archivos están disponibles en formato MP3 con una tasa de muestreo de 44.1 kHz. Cada pista incluye metadatos como artista, título, álbum, año de lanzamiento y etiquetas de género.
+
+Los métodos de adquisición de datos incluyen la descarga directa del repositorio oficial FMA (https://github.com/mdeff/fma), la utilización de los archivos CSV proporcionados que contienen metadatos estructurados y el acceso a datos mediante la API de FMA para información complementaria.
+
+\section*{2.2 Descripción de los Datos}
+El volumen de datos comprende 25,000 clips de audio de 30 segundos cada uno, con un tamaño total aproximado de 22 GB, distribuidos en 16 géneros musicales balanceados.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{timeline.png}
+    \caption{Evolución del conjunto de datos FMA (2009-2017): ID de pista más alto, pistas presentes y pistas añadidas bimensualmente.}
+    \label{fig:timeline_fma}
+\end{figure}
+
+Las características a extraer mediante librosa incluyen Coeficientes Cepstrales en las Frecuencias de Mel (MFCCs) con 20 coeficientes, Cromagramas como representación de 12 clases de altura tonal, Espectrograma de Mel como representación tiempo-frecuencia, Tasa de cruce por cero, Centroides espectrales y ancho de banda espectral, Contraste espectral y roll-off espectral, Tempograma y BPM (beats por minuto), y RMS (Root Mean Square) para energía.
+
+Mediante Echonest (The Echo Nest, ahora parte de Spotify) se extraen características de alto nivel como danzabilidad, energía, modo y tempo; características tonales como tonalidad y modo mayor/menor; características rítmicas como pulso y ritmo; y características tímbricas como brillantez y rugosidad.
+
+La estructura de metadatos incluye tracks.csv con ID de pista, título, artista, álbum, año y género(s); genres.csv con jerarquía de géneros musicales; features.csv con características pre-calculadas para cada pista; y echonest.csv con características de Echonest para cada pista.
+
+\section*{2.3 Exploración de Datos}
+El análisis estadístico de características a través de géneros incluye la distribución de MFCCs entre diferentes géneros musicales, comparación de valores de tempo y energía entre géneros, análisis de valores promedios, medianas, mínimos y máximos para cada característica, y pruebas estadísticas para determinar características discriminativas por género.
+
+La visualización de distribuciones de características se realiza mediante histogramas de distribución de características por género, gráficos de violín para comparar distribuciones entre géneros, mapas de calor para mostrar correlaciones entre características, y visualización t-SNE y PCA para explorar la separabilidad de géneros.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{feature_distribution.png}
+    \caption{Distribución de características}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{correlation_heatmap.png}
+    \caption{Heatmap de correlaciones entre características}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{pca_visualization.png}
+    \caption{MFCCs con PCA}
+    \label{fig:enter-label}
+\end{figure}
+
+El análisis de correlación entre características incluye matrices de correlación para identificar redundancias, análisis de componentes principales para reducción de dimensionalidad, y evaluación de multicolinealidad entre características de librosa y Echonest.
+
+El agrupamiento inicial para identificar agrupaciones naturales involucra la aplicación de K-means con diferentes valores de k, agrupamiento jerárquico para visualizar relaciones entre géneros, análisis de silueta para determinar la separabilidad de los clusters, y comparación entre agrupamientos naturales y etiquetas de género asignadas.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{clustering_results.png}
+    \caption{K-means clusters}
+    \label{fig:enter-label}
+\end{figure}
+
+\section*{2.4 Verificación de Calidad de Datos}
+Para comprobar datos faltantes en archivos de audio o metadatos, se llevó a cabo la identificación de pistas con metadatos incompletos (5.2\% del dataset), detección de archivos de audio corruptos o incompletos (1.7\% del dataset), y evaluación de pistas sin etiquetas de género claras o con múltiples etiquetas.
+
+Para identificar posibles valores atípicos en distribuciones de características, se realizó la detección mediante análisis de desviaciones estándar (método z-score), aplicación de técnicas de detección de anomalías basadas en densidad, y visualización de boxplots para identificar valores extremos en características acústicas.
+
+Para evaluar el desequilibrio de clases entre géneros, se llevó a cabo un análisis de la distribución de pistas por género principal, identificación de géneros subrepresentados o sobrerrepresentados, y evaluación de la necesidad de técnicas de muestreo para equilibrar clases.
+
+Para verificar la calidad y consistencia de audio, se realizó la comprobación de tasas de muestreo consistentes (44.1 kHz en todos los archivos), verificación de duración uniforme de 30 segundos para todos los clips, y análisis de calidad de compresión MP3 (bitrate medio de 256 kbps).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{waveform.png}
+    \caption{Forma de onda}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{spectrogram.png}
+    \caption{Espectrograma}
+    \label{fig:enter-label}
+\end{figure}
+
+\section*{Conclusión}
+
+Esta parte del proyecto estableció las bases para un sistema de clasificación de géneros musicales y recomendación utilizando el dataset FMA-medium, completando las fases iniciales de CRISP-DM. 
+
+Se definieron objetivos claros, se exploró y preparó el conjunto de datos FMA-medium, identificando características de audio relevantes (MFCCs, tempo, energía, etc.) y evaluando su calidad. La exploración inicial mediante PCA y K-means mostró potencial para la diferenciación de géneros, aunque se requiere un análisis más profundo.
+
+Los siguientes pasos se centrarán en el modelado predictivo para alcanzar una precisión de clasificación del 75 por ciento, desarrollar el sistema de recomendación e identificar las características más discriminativas entre géneros. La gestión de datos faltantes y el desequilibrio de clases serán cruciales.
+
+Se ha logrado una comprensión sólida de los datos, preparando el camino para las fases de modelado y evaluación con el fin de cumplir los objetivos del proyecto.
+
+\section*{Referencias}
+
+\begin{enumerate}
+    \item Free Music Archive (FMA) Dataset Repository. Disponible en: \url{https://github.com/mdeff/fma}.
+
+    \item Defferrard, M. (2017). FMA: A Dataset For Music Analysis (ISMIR'17 poster). Zenodo. \url{https://doi.org/10.5281/zenodo.1035847}.
+
+    \item Defferrard, M., Benzi, K., Vandergheynst, P., \& Bresson, X. (2017). {FMA}: A Dataset for Music Analysis. En \textit{Proceedings of the 18th International Society for Music Information Retrieval Conference (ISMIR)}. Disponible en: \url{https://arxiv.org/abs/1612.01840}.
+
+    \item Liu, K., DeMori, J., \& Abayomi, K. (2022). Open Set Recognition For Music Genre Classification. \textit{arXiv preprint arXiv:2209.07548}. Disponible en: \url{https://arxiv.org/abs/2209.07548}.
+\end{enumerate}
+
+\end{document}
