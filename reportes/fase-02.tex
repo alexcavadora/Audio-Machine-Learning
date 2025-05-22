@@ -1,0 +1,110 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}  
+
+\title{Preparación de Datos en el Proyecto FMA}
+\author{Análisis de Audio y Machine Learning}
+\date{\today}
+
+% Información de la portada
+\newcommand{\institucion}{UNIVERSIDAD DE GUANAJUATO}
+\newcommand{\materia}{Analisis de Datos}
+\newcommand{\profesor}{Carlos A. Carballo Monsivais}
+%\newcommand{\numeroTarea}{Número de Tarea: 01}
+\newcommand{\nombreTarea}{CRISP-DM. Clasificación de Géneros Musicales y Análisis de Similitud. Capitulo 3. Preparacion de los Datos}
+\newcommand{\estudiante}{Alejandro Alonso Sanchez, Piotr Enriquevitch Lopez Chernyshov, Victor Angel Lopez Romero}
+\newcommand{\fechaEntrega}{Fecha de Entrega: 14/05/2025}
+\newcommand{\nua}{NUA: 148494}
+% Título del documento
+\title{Reporte de Tareas Prácticas}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \includegraphics[width=0.3\textwidth]{logoUG.png}\par\vspace{1cm}
+    {\scshape\LARGE \institucion \par}
+    \vspace{1cm}
+    {\scshape\Large \materia \par}
+    \vspace{1.5cm}
+    {\scshape\bfseries \numeroTarea \par}
+    \vspace{1.5cm}
+    {\huge\bfseries \nombreTarea \par}
+    \vspace{2cm}
+    Alumnos: \par
+    {\Large\itshape \estudiante \par}
+    \vfill
+    Profesor:\par
+    \textsc{\profesor}
+    \vfill
+    {\large \fechaEntrega\par}
+\end{titlepage}
+
+\section*{Contexto y Objetivo}
+Este trabajo da continuidad al análisis iniciado en la fase de comprensión y exploración de datos, cuyo objetivo principal es desarrollar un modelo capaz de clasificar canciones en géneros musicales a partir de características de audio extraídas del conjunto de datos FMA-medium. Además, se busca identificar qué características son más relevantes para la diferenciación de géneros y sentar las bases para un sistema de recomendación musical.
+
+El dataset FMA-medium contiene 25,000 clips de 30 segundos en formato MP3, distribuidos en 16 géneros musicales, con metadatos detallados (artista, título, álbum, año, género) y características extraídas tanto con librosa como con la API de Spotify (anteriormente Echonest).
+
+\section*{3. Preparación de los Datos}
+
+\section*{3.1 Conceptos básicos de preparación de datos}
+La segunda fase del modelo CRISP-ML(Q) tiene como objetivo preparar los datos para la fase de modelado. En esta etapa se realizan tareas de selección de datos, limpieza, ingeniería de características, estandarización y normalización, asegurando la calidad y adecuación de los datos para el aprendizaje automático. 
+
+Durante la selección de datos, se identifican y retienen únicamente las muestras y características valiosas y necesarias para el entrenamiento futuro, utilizando métodos de filtrado, envoltura o embebidos, y descartando muestras que no cumplen con los requisitos de calidad. Si existe desbalance de clases, se pueden aplicar estrategias de sobremuestreo o submuestreo.
+
+La limpieza de datos implica la detección y corrección de errores, así como la implementación de pruebas unitarias para mitigar la propagación de errores. Dependiendo de la tarea, se pueden realizar actividades de ingeniería de características y aumento de datos, como codificación one-hot, clustering o discretización de atributos continuos.
+
+La estandarización y normalización buscan unificar los datos de entrada y evitar sesgos debidos a escalas diferentes. Finalmente, se construyen pipelines de transformación y preprocesamiento para garantizar la reproducibilidad y trazabilidad del proceso de preparación de datos.
+
+En el contexto del proyecto FMA (Free Music Archive), la preparación de datos abarca la extracción de características de audio usando librosa (MFCCs, cromagramas, espectrograma de Mel, centroides espectrales, contraste espectral, tempo, RMS, entre otros), así como la obtención de características de alto nivel mediante la API de Spotify/Echonest (danzabilidad, energía, modo, tempo, tonalidad, brillantez, etc.). Además, se realiza el procesamiento y validación de metadatos musicales, el manejo de diferentes formatos de audio y metadatos, la normalización y estandarización de datos, la gestión de licencias y permisos, la implementación de pipelines de preparación y la evaluación de modelos de clasificación.
+
+\section*{3.2 Selección de datos}
+Para este proyecto, el equipo decidió trabajar exclusivamente con el subconjunto fma medium del FMA, compuesto por 25,000 pistas con metadatos limpios y audio de calidad. Este subconjunto fue seleccionado por su tamaño manejable y representatividad para tareas de clasificación musical. La selección de datos se basó en criterios como la calidad del audio (bit rate superior a 100,000), la duración uniforme de las pistas (todas de 30 segundos), la popularidad medida por el número de reproducciones, la disponibilidad de metadatos y las licencias permitidas para redistribución. Además, se consideró la distribución de géneros, priorizando los 8 géneros principales y buscando un balance entre clases, aunque se reconoce el desbalance natural entre géneros como Rock y Electrónica.
+
+La siguiente figura muestra la distribución de géneros musicales en el dataset fma medium:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{distribucion_generos.jpeg}
+    \caption{Distribución de géneros musicales en el dataset fma medium}
+    \label{fig:distribucion_generos}
+\end{figure}
+
+\section*{3.3 Limpieza de datos}
+La limpieza de datos en este proyecto incluyó el recorte de pistas a 30 segundos, la normalización de permisos y tiempos de modificación, y la verificación de integridad mediante checksums. Se manejaron errores en la extracción de características y, de manera importante, se eliminaron las pistas con datos faltantes, ya que representaban una pérdida mínima de información. También se filtraron pistas con características faltantes y se gestionaron valores NaN en las matrices de características. En cuanto a los metadatos, se eliminaron campos redundantes, se normalizaron los formatos de fecha, se corrigieron jerarquías de géneros y se eliminaron duplicados. Además, se validaron las etiquetas de género y se analizó la distribución de géneros para asegurar la coherencia de los datos.
+
+\section*{3.4 Construcción de Nuevos Datos}
+La construcción de nuevos datos se centró en la extracción de características de audio utilizando librosa, obteniendo MFCCs, características espectrales (centroide, ancho de banda, contraste), cromáticas, temporales (ZCR, RMSE), tonales (tonnetz) y de contraste espectral. Para cada característica se calcularon estadísticas como media, desviación estándar, asimetría, curtosis, mediana, mínimo y máximo. La siguiente figura ilustra la distribución de las características de audio extraídas:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{distribucion_caracteristicas_audio.jpeg}
+    \caption{Distribución de las características de audio extraídas (mfcc, spectral\_contrast, tonnetz, chroma\_cens)}
+    \label{fig:distribucion_caracteristicas_audio}
+\end{figure}
+
+Adicionalmente, se prepararon los datos para los modelos mediante la codificación de etiquetas con LabelEncoder, la estandarización de características con StandardScaler y la reducción de dimensionalidad con PCA, reteniendo el 95\% de la varianza. Los datos se dividieron en conjuntos de entrenamiento (80\%) y prueba (20\%), y se aplicó validación cruzada para la evaluación de modelos. La siguiente figura muestra las 20 características más importantes para la clasificación:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{top20_caracteristicas.jpeg}
+    \caption{Top 20 características más importantes para la clasificación}
+    \label{fig:top20_caracteristicas}
+\end{figure}
+
+\section*{3.5 Integración de Datos}
+La integración de datos se realizó a partir de diversas fuentes: metadatos de pistas (tracks.csv), álbumes (albums.csv), artistas (artists.csv), características de audio (features.csv) y características de Echonest, extraídas mediante la API de Spotify (anteriormente Echonest). Los datos preparados se almacenaron en archivos NPY (X\_prepared.npy, y\_prepared.npy). El proceso de integración incluyó la unión de metadatos por ID de pista, la alineación de características de audio y la integración de características de Echonest, así como el manejo de valores faltantes y la verificación de consistencia. Finalmente, se prepararon los datos para los modelos y se evaluaron los resultados de clasificación.
+
+\section*{3.6 Formato de Datos}
+El formato de los datos utilizados en el proyecto es variado. Los archivos de audio se encuentran en formato MP3, mientras que los metadatos y las características se almacenan en archivos CSV con índices múltiples y formato científico. Los datos preparados para el modelado se guardan en archivos NPY (arrays de NumPy), y los resultados de las evaluaciones y visualizaciones se presentan en archivos PNG. La estructura de los datos incluye una organización jerárquica de géneros, índices múltiples para los metadatos, matrices de características normalizadas, vectores de etiquetas codificados, conjuntos de entrenamiento y prueba, así como resultados y visualizaciones de rendimiento de los modelos.
+
+\section*{Conclusión}
+
+La preparación de datos en el proyecto FMA es un proceso complejo que involucra múltiples etapas de procesamiento, desde la selección inicial hasta la integración final de diferentes fuentes de datos. El resultado es un conjunto de datos bien estructurado y normalizado, listo para su uso en tareas de machine learning y análisis musical. El pipeline de preparación asegura características limpias y estandarizadas, reducción de dimensionalidad preservando información, resultados reproducibles y almacenamiento eficiente para el entrenamiento de modelos.
+
+\end{document} 
